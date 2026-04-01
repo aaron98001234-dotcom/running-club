@@ -1,0 +1,61 @@
+@import "tailwindcss";
+
+:root {
+  --background: #eef3f8;
+  --foreground: #102238;
+  --train-navy: #173a5e;
+  --train-gold: #f2c14e;
+  --train-steel: #567189;
+  --train-card: #ffffff;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-geist-sans), "Segoe UI", sans-serif;
+  background-image:
+    linear-gradient(to bottom, #f8fbff 0%, #e8eff7 52%, #d8e2ee 100%),
+    repeating-linear-gradient(
+      90deg,
+      transparent 0,
+      transparent 72px,
+      rgba(23, 58, 94, 0.06) 72px,
+      rgba(23, 58, 94, 0.06) 76px
+    );
+}
+
+.train-track {
+  position: relative;
+}
+
+.train-track::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  height: 8px;
+  top: -8px;
+  background:
+    repeating-linear-gradient(
+      90deg,
+      #304e6f 0 26px,
+      transparent 26px 42px
+    ),
+    linear-gradient(180deg, #233f60, #2a4a6e);
+  border-radius: 999px;
+  opacity: 0.8;
+}
+
+.train-button {
+  background: linear-gradient(135deg, #214e7a 0%, #173a5e 100%);
+}
+
+.train-button:hover {
+  background: linear-gradient(135deg, #2a5d8d 0%, #1d446b 100%);
+}
