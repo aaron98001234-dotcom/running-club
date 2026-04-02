@@ -11,6 +11,23 @@ type RunRecord = {
   created_at: string;
 };
 
+function formatDateTime(isoString: string) {
+  const date = new Date(isoString);
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  const hour = String(date.getHours()).padStart(2, "0");
+  const minute = String(date.getMinutes()).padStart(2, "0");
+
+  return `${year}/${month}/${day} ${hour}:${minute}`;
+}
+
+function formatTotalDuration(totalMinutes: number) {
+  const hours = Math.floor(totalMinutes / 60);
+  const minutes = totalMinutes % 60;
+  return `${hours} 小時 ${minutes} 分`;
+}
+
 export default function RecordsManager() {
   const supabase = useMemo(() => createSupabaseBrowserClient(), []);
   const [records, setRecords] = useState<RunRecord[]>([]);
@@ -19,10 +36,16 @@ export default function RecordsManager() {
   const [status, setStatus] = useState("");
   const [loading, setLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
   const [userId, setUserId] = useState<string | null>(null);
 
   const totalDistance = useMemo(
     () => records.reduce((sum, item) => sum + item.distance_km, 0),
+    [records],
+  );
+
+  const totalDuration = useMemo(
+    () => records.reduce((sum, item) => sum + item.duration_min, 0),
     [records],
   );
 
@@ -110,6 +133,32 @@ export default function RecordsManager() {
     setStatus("已新增一筆行車紀錄");
   };
 
+  const onDelete = async (recordId: string) => {
+    if (!userId) {
+      setStatus("請先登入");
+      return;
+    }
+
+    setStatus("");
+    setDeletingId(recordId);
+
+    const { error } = await supabase
+      .from("running_records")
+      .delete()
+      .eq("id", recordId)
+      .eq("user_id", userId);
+
+    setDeletingId(null);
+
+    if (error) {
+      setStatus(error.message);
+      return;
+    }
+
+    setRecords((prev) => prev.filter((record) => record.id !== recordId));
+    setStatus("已刪除一筆行車紀錄");
+  };
+
   if (loading) {
     return <p className="text-sm text-zinc-600">列車資料載入中...</p>;
   }
@@ -132,12 +181,16 @@ export default function RecordsManager() {
 
   return (
     <div className="grid gap-6">
-      <div className="rounded-xl border border-slate-200 bg-slate-50 p-4">
-        <p className="text-sm text-zinc-600">目前行車總覽</p>
-        <p className="mt-1 text-xl font-bold text-zinc-900">
-          {records.length} 筆 / 總里程 {totalDistance.toFixed(1)} km
-        </p>
-      </div>
+      <section className="grid gap-3 rounded-xl border border-slate-200 bg-slate-50 p-4 sm:grid-cols-2">
+        <div className="rounded-lg border border-slate-200 bg-white px-4 py-3">
+          <p className="text-sm text-zinc-600">總里程數</p>
+          <p className="mt-1 text-2xl font-bold text-zinc-900">{totalDistance.toFixed(1)} km</p>
+        </div>
+        <div className="rounded-lg border border-slate-200 bg-white px-4 py-3">
+          <p className="text-sm text-zinc-600">總時間</p>
+          <p className="mt-1 text-2xl font-bold text-zinc-900">{formatTotalDuration(totalDuration)}</p>
+        </div>
+      </section>
 
       <section className="rounded-xl border border-slate-200 bg-white p-4 sm:p-5">
         <h2 className="text-lg font-semibold text-zinc-900">新增紀錄</h2>
@@ -178,7 +231,7 @@ export default function RecordsManager() {
             disabled={isSubmitting}
             className="train-button w-fit rounded-lg px-4 py-2 text-sm font-semibold text-white transition disabled:cursor-not-allowed disabled:bg-slate-400"
           >
-            {isSubmitting ? "列車更新中..." : "新增行車紀錄"}
+            {isSubmitting ? "傳送中..." : "新增行車紀錄"}
           </button>
 
           {status ? <p className="text-sm text-zinc-600">{status}</p> : null}
@@ -196,13 +249,37 @@ export default function RecordsManager() {
             records.map((record) => (
               <article
                 key={record.id}
-                className="rounded-xl border border-slate-200 bg-slate-50 px-4 py-3"
+                className="flex items-center justify-between gap-3 rounded-xl border border-slate-200 bg-slate-50 px-4 py-3"
               >
-                <p className="font-semibold text-zinc-900">{record.distance_km} km</p>
-                <p className="text-sm text-zinc-600">{record.duration_min} 分鐘</p>
-                <p className="text-xs text-zinc-500">
-                  {new Date(record.created_at).toLocaleString()}
-                </p>
+                <div>
+                  <p className="font-semibold text-zinc-900">{record.distance_km} km</p>
+                  <p className="text-sm text-zinc-600">{record.duration_min} 分鐘</p>
+                  <p className="text-xs text-zinc-500">{formatDateTime(record.created_at)}</p>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => onDelete(record.id)}
+                  disabled={deletingId === record.id}
+                  className="rounded-lg border border-rose-200 bg-white p-2 text-rose-600 transition hover:bg-rose-50 disabled:cursor-not-allowed disabled:opacity-60"
+                  aria-label="刪除紀錄"
+                  title="刪除紀錄"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    className="h-4 w-4"
+                  >
+                    <path d="M3 6h18" />
+                    <path d="M8 6V4h8v2" />
+                    <path d="M19 6l-1 14H6L5 6" />
+                    <path d="M10 11v6" />
+                    <path d="M14 11v6" />
+                  </svg>
+                </button>
               </article>
             ))
           )}

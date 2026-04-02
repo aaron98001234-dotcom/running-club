@@ -2,8 +2,10 @@
 
 This project includes:
 - Email login with Supabase Auth
+- Email sign up, forgot password, and reset password flow
 - Insert running records
 - Read running records from Supabase
+- Delete running records from Supabase
 
 ## 1. Environment Variables
 
@@ -41,6 +43,11 @@ create policy "users_can_insert_own_records"
 on public.running_records
 for insert
 with check (auth.uid() = user_id);
+
+create policy "users_can_delete_own_records"
+on public.running_records
+for delete
+using (auth.uid() = user_id);
 ```
 
 ## 3. Enable Email Login
