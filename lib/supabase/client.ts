@@ -1,4 +1,5 @@
-﻿import { createClient, SupabaseClient } from "@supabase/supabase-js";
+﻿import { createBrowserClient } from "@supabase/ssr";
+import type { SupabaseClient } from "@supabase/supabase-js";
 
 let client: SupabaseClient | null = null;
 
@@ -16,6 +17,6 @@ export function createSupabaseBrowserClient() {
     );
   }
 
-  client = createClient(supabaseUrl, supabaseAnonKey);
+  client = createBrowserClient(supabaseUrl, supabaseAnonKey);
   return client;
 }

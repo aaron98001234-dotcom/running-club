@@ -1,7 +1,18 @@
-﻿import Card from "../components/card";
+﻿import { redirect } from "next/navigation";
+import Card from "../components/card";
+import { createSupabaseServerClient } from "../../lib/supabase/server";
 import RecordsManager from "./records-manager";
 
-export default function RecordsPage() {
+export default async function RecordsPage() {
+  const supabase = await createSupabaseServerClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    redirect("/login");
+  }
+
   return (
     <div className="w-full">
       <Card className="mx-auto w-full max-w-3xl">

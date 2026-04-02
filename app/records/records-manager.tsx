@@ -12,12 +12,13 @@ type RunRecord = {
 };
 
 export default function RecordsManager() {
-  const supabase = createSupabaseBrowserClient();
+  const supabase = useMemo(() => createSupabaseBrowserClient(), []);
   const [records, setRecords] = useState<RunRecord[]>([]);
   const [distanceKm, setDistanceKm] = useState("");
   const [durationMin, setDurationMin] = useState("");
   const [status, setStatus] = useState("");
   const [loading, setLoading] = useState(true);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [userId, setUserId] = useState<string | null>(null);
 
   const totalDistance = useMemo(
@@ -47,6 +48,7 @@ export default function RecordsManager() {
       const { data, error } = await supabase
         .from("running_records")
         .select("id, distance_km, duration_min, created_at")
+        .eq("user_id", user.id)
         .order("created_at", { ascending: false });
 
       if (error) {
@@ -69,8 +71,11 @@ export default function RecordsManager() {
     const parsedDistance = Number(distanceKm);
     const parsedDuration = Number(durationMin);
 
-    if (parsedDistance <= 0 || parsedDuration <= 0) {
-      setStatus("距離與時間都必須大於 0");
+    const isDistanceValid = Number.isFinite(parsedDistance) && parsedDistance > 0;
+    const isDurationValid = Number.isFinite(parsedDuration) && parsedDuration > 0;
+
+    if (!isDistanceValid || !isDurationValid) {
+      setStatus("距離與時間都必須是大於 0 的有效數字");
       return;
     }
 
@@ -80,6 +85,7 @@ export default function RecordsManager() {
     }
 
     setStatus("");
+    setIsSubmitting(true);
 
     const { data, error } = await supabase
       .from("running_records")
@@ -90,6 +96,8 @@ export default function RecordsManager() {
       })
       .select("id, distance_km, duration_min, created_at")
       .single();
+
+    setIsSubmitting(false);
 
     if (error) {
       setStatus(error.message);
@@ -179,9 +187,10 @@ export default function RecordsManager() {
 
         <button
           type="submit"
-          className="train-button w-fit rounded-lg px-4 py-2 text-sm font-semibold text-white transition"
+          disabled={isSubmitting}
+          className="train-button w-fit rounded-lg px-4 py-2 text-sm font-semibold text-white transition disabled:cursor-not-allowed disabled:bg-slate-400"
         >
-          新增行車紀錄
+          {isSubmitting ? "列車更新中..." : "新增行車紀錄"}
         </button>
 
         {status ? <p className="text-sm text-zinc-600">{status}</p> : null}
