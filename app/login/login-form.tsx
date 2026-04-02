@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { createSupabaseBrowserClient } from "../../lib/supabase/client";
 
 type AuthMode = "login" | "signup" | "forgot";
+type Gender = "male" | "female" | "other";
 
 const MIN_PASSWORD_LENGTH = 6;
 
@@ -15,6 +16,10 @@ export default function LoginForm() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [nickname, setNickname] = useState("");
+  const [gender, setGender] = useState<Gender | "">("");
+  const [age, setAge] = useState("");
+  const [runningYears, setRunningYears] = useState("");
   const [message, setMessage] = useState("");
   const [isError, setIsError] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -70,6 +75,41 @@ export default function LoginForm() {
       return;
     }
 
+    if (!nickname.trim()) {
+      setMessage("註冊時請填寫暱稱。");
+      setIsError(true);
+      setLoading(false);
+      return;
+    }
+
+    if (!gender) {
+      setMessage("註冊時請選擇性別。");
+      setIsError(true);
+      setLoading(false);
+      return;
+    }
+
+    const parsedAge = Number(age);
+    const parsedRunningYears = Number(runningYears);
+
+    if (!Number.isInteger(parsedAge) || parsedAge < 1 || parsedAge > 120) {
+      setMessage("年齡請輸入 1 到 120 的整數。");
+      setIsError(true);
+      setLoading(false);
+      return;
+    }
+
+    if (
+      !Number.isFinite(parsedRunningYears) ||
+      parsedRunningYears < 0 ||
+      parsedRunningYears > 120
+    ) {
+      setMessage("跑齡請輸入 0 到 120 的數字。");
+      setIsError(true);
+      setLoading(false);
+      return;
+    }
+
     if (password.length < MIN_PASSWORD_LENGTH) {
       setMessage(`密碼至少需要 ${MIN_PASSWORD_LENGTH} 個字元。`);
       setIsError(true);
@@ -89,6 +129,12 @@ export default function LoginForm() {
       password,
       options: {
         emailRedirectTo: `${origin}/auth/callback?next=/records`,
+        data: {
+          nickname: nickname.trim(),
+          gender,
+          age: parsedAge,
+          running_years: parsedRunningYears,
+        },
       },
     });
 
@@ -176,17 +222,76 @@ export default function LoginForm() {
         ) : null}
 
         {mode === "signup" ? (
-          <label className="grid gap-1 text-sm">
-            <span className="font-medium text-zinc-700">確認密碼</span>
-            <input
-              type="password"
-              required
-              value={confirmPassword}
-              onChange={(event) => setConfirmPassword(event.target.value)}
-              className="rounded-lg border border-slate-300 px-3 py-2 outline-none ring-amber-400 transition focus:ring-2"
-              placeholder="********"
-            />
-          </label>
+          <>
+            <label className="grid gap-1 text-sm">
+              <span className="font-medium text-zinc-700">暱稱</span>
+              <input
+                type="text"
+                required
+                value={nickname}
+                onChange={(event) => setNickname(event.target.value)}
+                className="rounded-lg border border-slate-300 px-3 py-2 outline-none ring-amber-400 transition focus:ring-2"
+                placeholder="例如：追風列車"
+              />
+            </label>
+
+            <label className="grid gap-1 text-sm">
+              <span className="font-medium text-zinc-700">性別</span>
+              <select
+                required
+                value={gender}
+                onChange={(event) => setGender(event.target.value as Gender)}
+                className="rounded-lg border border-slate-300 px-3 py-2 outline-none ring-amber-400 transition focus:ring-2"
+              >
+                <option value="">請選擇</option>
+                <option value="male">男性</option>
+                <option value="female">女性</option>
+                <option value="other">其他</option>
+              </select>
+            </label>
+
+            <div className="grid gap-4 sm:grid-cols-2">
+              <label className="grid gap-1 text-sm">
+                <span className="font-medium text-zinc-700">年齡</span>
+                <input
+                  type="number"
+                  min="1"
+                  max="120"
+                  required
+                  value={age}
+                  onChange={(event) => setAge(event.target.value)}
+                  className="rounded-lg border border-slate-300 px-3 py-2 outline-none ring-amber-400 transition focus:ring-2"
+                  placeholder="25"
+                />
+              </label>
+
+              <label className="grid gap-1 text-sm">
+                <span className="font-medium text-zinc-700">跑齡（年）</span>
+                <input
+                  type="number"
+                  min="0"
+                  step="0.5"
+                  required
+                  value={runningYears}
+                  onChange={(event) => setRunningYears(event.target.value)}
+                  className="rounded-lg border border-slate-300 px-3 py-2 outline-none ring-amber-400 transition focus:ring-2"
+                  placeholder="2"
+                />
+              </label>
+            </div>
+
+            <label className="grid gap-1 text-sm">
+              <span className="font-medium text-zinc-700">確認密碼</span>
+              <input
+                type="password"
+                required
+                value={confirmPassword}
+                onChange={(event) => setConfirmPassword(event.target.value)}
+                className="rounded-lg border border-slate-300 px-3 py-2 outline-none ring-amber-400 transition focus:ring-2"
+                placeholder="********"
+              />
+            </label>
+          </>
         ) : null}
 
         <button

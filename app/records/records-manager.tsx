@@ -110,13 +110,6 @@ export default function RecordsManager() {
     setStatus("已新增一筆行車紀錄");
   };
 
-  const signOut = async () => {
-    await supabase.auth.signOut();
-    setUserId(null);
-    setRecords([]);
-    setStatus("已登出");
-  };
-
   if (loading) {
     return <p className="text-sm text-zinc-600">列車資料載入中...</p>;
   }
@@ -139,81 +132,82 @@ export default function RecordsManager() {
 
   return (
     <div className="grid gap-6">
-      <div className="flex items-center justify-between rounded-xl border border-slate-200 bg-slate-50 p-4">
-        <div>
-          <p className="text-sm text-zinc-600">目前行車總覽</p>
-          <p className="mt-1 text-xl font-bold text-zinc-900">
-            {records.length} 筆 / 總里程 {totalDistance.toFixed(1)} km
-          </p>
-        </div>
-        <button
-          type="button"
-          onClick={signOut}
-          className="rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm font-medium text-zinc-700 transition hover:bg-slate-50"
-        >
-          列車離站（登出）
-        </button>
+      <div className="rounded-xl border border-slate-200 bg-slate-50 p-4">
+        <p className="text-sm text-zinc-600">目前行車總覽</p>
+        <p className="mt-1 text-xl font-bold text-zinc-900">
+          {records.length} 筆 / 總里程 {totalDistance.toFixed(1)} km
+        </p>
       </div>
 
-      <form onSubmit={onSubmit} className="grid gap-4">
-        <div className="grid gap-4 sm:grid-cols-2">
-          <label className="grid gap-1 text-sm">
-            <span className="font-medium text-zinc-700">距離（km）</span>
-            <input
-              type="number"
-              min="0"
-              step="0.1"
-              required
-              value={distanceKm}
-              onChange={(event) => setDistanceKm(event.target.value)}
-              className="rounded-lg border border-slate-300 px-3 py-2 outline-none ring-amber-400 transition focus:ring-2"
-              placeholder="5.0"
-            />
-          </label>
-          <label className="grid gap-1 text-sm">
-            <span className="font-medium text-zinc-700">時間（分鐘）</span>
-            <input
-              type="number"
-              min="0"
-              step="1"
-              required
-              value={durationMin}
-              onChange={(event) => setDurationMin(event.target.value)}
-              className="rounded-lg border border-slate-300 px-3 py-2 outline-none ring-amber-400 transition focus:ring-2"
-              placeholder="30"
-            />
-          </label>
+      <section className="rounded-xl border border-slate-200 bg-white p-4 sm:p-5">
+        <h2 className="text-lg font-semibold text-zinc-900">新增紀錄</h2>
+        <p className="mt-1 text-sm text-zinc-600">輸入本次訓練的距離與時間。</p>
+
+        <form onSubmit={onSubmit} className="mt-4 grid gap-4">
+          <div className="grid gap-4 sm:grid-cols-2">
+            <label className="grid gap-1 text-sm">
+              <span className="font-medium text-zinc-700">距離（km）</span>
+              <input
+                type="number"
+                min="0"
+                step="0.1"
+                required
+                value={distanceKm}
+                onChange={(event) => setDistanceKm(event.target.value)}
+                className="rounded-lg border border-slate-300 px-3 py-2 outline-none ring-amber-400 transition focus:ring-2"
+                placeholder="5.0"
+              />
+            </label>
+            <label className="grid gap-1 text-sm">
+              <span className="font-medium text-zinc-700">時間（分鐘）</span>
+              <input
+                type="number"
+                min="0"
+                step="1"
+                required
+                value={durationMin}
+                onChange={(event) => setDurationMin(event.target.value)}
+                className="rounded-lg border border-slate-300 px-3 py-2 outline-none ring-amber-400 transition focus:ring-2"
+                placeholder="30"
+              />
+            </label>
+          </div>
+
+          <button
+            type="submit"
+            disabled={isSubmitting}
+            className="train-button w-fit rounded-lg px-4 py-2 text-sm font-semibold text-white transition disabled:cursor-not-allowed disabled:bg-slate-400"
+          >
+            {isSubmitting ? "列車更新中..." : "新增行車紀錄"}
+          </button>
+
+          {status ? <p className="text-sm text-zinc-600">{status}</p> : null}
+        </form>
+      </section>
+
+      <section className="rounded-xl border border-slate-200 bg-white p-4 sm:p-5">
+        <h2 className="text-lg font-semibold text-zinc-900">歷史紀錄</h2>
+        <p className="mt-1 text-sm text-zinc-600">查看你過去所有訓練資料。</p>
+
+        <div className="mt-4 grid gap-3">
+          {records.length === 0 ? (
+            <p className="text-sm text-zinc-500">尚無紀錄，先新增第一趟。</p>
+          ) : (
+            records.map((record) => (
+              <article
+                key={record.id}
+                className="rounded-xl border border-slate-200 bg-slate-50 px-4 py-3"
+              >
+                <p className="font-semibold text-zinc-900">{record.distance_km} km</p>
+                <p className="text-sm text-zinc-600">{record.duration_min} 分鐘</p>
+                <p className="text-xs text-zinc-500">
+                  {new Date(record.created_at).toLocaleString()}
+                </p>
+              </article>
+            ))
+          )}
         </div>
-
-        <button
-          type="submit"
-          disabled={isSubmitting}
-          className="train-button w-fit rounded-lg px-4 py-2 text-sm font-semibold text-white transition disabled:cursor-not-allowed disabled:bg-slate-400"
-        >
-          {isSubmitting ? "列車更新中..." : "新增行車紀錄"}
-        </button>
-
-        {status ? <p className="text-sm text-zinc-600">{status}</p> : null}
-      </form>
-
-      <div className="grid gap-3">
-        {records.length === 0 ? (
-          <p className="text-sm text-zinc-500">尚無紀錄，先新增第一趟。</p>
-        ) : (
-          records.map((record) => (
-            <article
-              key={record.id}
-              className="rounded-xl border border-slate-200 bg-white px-4 py-3"
-            >
-              <p className="font-semibold text-zinc-900">{record.distance_km} km</p>
-              <p className="text-sm text-zinc-600">{record.duration_min} 分鐘</p>
-              <p className="text-xs text-zinc-500">
-                {new Date(record.created_at).toLocaleString()}
-              </p>
-            </article>
-          ))
-        )}
-      </div>
+      </section>
     </div>
   );
 }

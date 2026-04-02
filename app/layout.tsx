@@ -1,6 +1,7 @@
 ﻿import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import Link from "next/link";
+import { createSupabaseServerClient } from "../lib/supabase/server";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -18,14 +19,19 @@ export const metadata: Metadata = {
   description: "火車嘟嘟嘟社團網站",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const supabase = await createSupabaseServerClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
   return (
     <html
-      lang="en"
+      lang="zh-Hant"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
@@ -42,10 +48,10 @@ export default function RootLayout({
                 首頁
               </Link>
               <Link
-                href="/login"
+                href={user ? "/profile" : "/login"}
                 className="rounded-full px-3 py-1.5 text-slate-700 hover:bg-slate-100"
               >
-                登入
+                {user ? "個人" : "登入"}
               </Link>
               <Link
                 href="/records"
