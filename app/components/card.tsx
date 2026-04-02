@@ -1,4 +1,4 @@
-import { PropsWithChildren } from "react";
+﻿import { PropsWithChildren } from "react";
 
 type CardProps = PropsWithChildren<{
   className?: string;
@@ -7,7 +7,7 @@ type CardProps = PropsWithChildren<{
 export default function Card({ children, className = "" }: CardProps) {
   return (
     <section
-      className={`train-track rounded-2xl border border-slate-300 bg-[var(--train-card)] p-6 shadow-[0_8px_24px_rgba(30,52,79,0.12)] ${className}`.trim()}
+      className={`train-track rounded-2xl border border-slate-300 bg-[var(--train-card)] p-6 shadow-[0_8px_24px_rgba(30,52,79,0.12)] transition hover:shadow-[0_10px_30px_rgba(30,52,79,0.18)] ${className}`.trim()}
     >
       {children}
     </section>

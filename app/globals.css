@@ -1,4 +1,4 @@
-@import "tailwindcss";
+﻿@import "tailwindcss";
 
 :root {
   --background: #eef3f8;
@@ -58,4 +58,18 @@ body {
 
 .train-button:hover {
   background: linear-gradient(135deg, #2a5d8d 0%, #1d446b 100%);
+}
+
+.train-button-alt {
+  background: linear-gradient(135deg, #f4cc67 0%, #f2c14e 100%);
+}
+
+.train-button-alt:hover {
+  background: linear-gradient(135deg, #ffd775 0%, #f7ca55 100%);
+}
+
+.train-chip {
+  border: 1px solid #d6deea;
+  background: #f8fbff;
+  color: #35516f;
 }

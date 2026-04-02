@@ -27,6 +27,13 @@ export default async function ProfilePage() {
     other: "其他",
   };
 
+  const profileComplete = Boolean(
+    metadata.nickname &&
+      metadata.gender &&
+      metadata.age !== undefined &&
+      metadata.running_years !== undefined,
+  );
+
   return (
     <div className="w-full">
       <Card className="mx-auto w-full max-w-2xl">
@@ -34,6 +41,13 @@ export default async function ProfilePage() {
         <p className="mt-2 text-sm text-zinc-600">
           這裡會顯示你註冊時填寫的基本資料。
         </p>
+
+        <div className="mt-4 rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-700">
+          資料完整度：
+          <span className={profileComplete ? "font-semibold text-emerald-700" : "font-semibold text-amber-700"}>
+            {profileComplete ? " 已完整" : " 尚未完整"}
+          </span>
+        </div>
 
         <div className="mt-6 grid gap-3 rounded-xl border border-slate-200 bg-white p-4 text-sm">
           <p>

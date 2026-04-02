@@ -19,6 +19,10 @@ export const metadata: Metadata = {
   description: "火車嘟嘟嘟社團網站",
 };
 
+type UserMetadata = {
+  nickname?: string;
+};
+
 export default async function RootLayout({
   children,
 }: Readonly<{
@@ -28,6 +32,9 @@ export default async function RootLayout({
   const {
     data: { user },
   } = await supabase.auth.getUser();
+
+  const metadata = (user?.user_metadata ?? {}) as UserMetadata;
+  const profileLabel = metadata.nickname ? `個人（${metadata.nickname}）` : "個人";
 
   return (
     <html
@@ -43,19 +50,19 @@ export default async function RootLayout({
             <div className="flex items-center gap-2 text-sm font-medium">
               <Link
                 href="/"
-                className="rounded-full px-3 py-1.5 text-slate-700 hover:bg-slate-100"
+                className="rounded-full px-3 py-1.5 text-slate-700 transition hover:bg-slate-100"
               >
                 首頁
               </Link>
               <Link
                 href={user ? "/profile" : "/login"}
-                className="rounded-full px-3 py-1.5 text-slate-700 hover:bg-slate-100"
+                className="rounded-full px-3 py-1.5 text-slate-700 transition hover:bg-slate-100"
               >
-                {user ? "個人" : "登入"}
+                {user ? profileLabel : "登入"}
               </Link>
               <Link
                 href="/records"
-                className="rounded-full px-3 py-1.5 text-slate-700 hover:bg-slate-100"
+                className="rounded-full px-3 py-1.5 text-slate-700 transition hover:bg-slate-100"
               >
                 紀錄
               </Link>

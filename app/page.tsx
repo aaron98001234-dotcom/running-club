@@ -5,13 +5,13 @@ export default function Home() {
   return (
     <div className="grid w-full gap-6">
       <Card>
-        <p className="text-sm font-semibold uppercase tracking-wider text-amber-600">
+        <p className="inline-flex rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-wider train-chip">
           Train Club
         </p>
-        <h1 className="mt-2 text-3xl font-bold tracking-tight text-zinc-900">
+        <h1 className="mt-3 text-3xl font-bold tracking-tight text-zinc-900 sm:text-4xl">
           火車嘟嘟嘟
         </h1>
-        <p className="mt-4 text-zinc-600">
+        <p className="mt-4 max-w-3xl text-zinc-600">
           歡迎來到火車嘟嘟嘟社團網站。你可以使用 Email 登入或註冊，
           新增每次練習紀錄，並從 Supabase 載入歷史資料，像列車時刻表一樣穩定追蹤進度。
         </p>
@@ -52,7 +52,7 @@ export default function Home() {
           </p>
           <Link
             href="/records"
-            className="mt-4 inline-flex rounded-lg bg-amber-500 px-4 py-2 text-sm font-semibold text-slate-900 transition hover:bg-amber-400"
+            className="train-button-alt mt-4 inline-flex rounded-lg px-4 py-2 text-sm font-semibold text-slate-900 transition"
           >
             開啟紀錄
           </Link>
