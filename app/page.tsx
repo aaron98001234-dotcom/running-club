@@ -12,8 +12,22 @@ export default function Home() {
           火車嘟嘟嘟
         </h1>
         <p className="mt-4 text-zinc-600">
-          歡迎來到火車嘟嘟嘟社團網站。你可以使用 Email 登入，新增每次練習紀錄，
-          並從 Supabase 載入歷史資料，像列車時刻表一樣穩定追蹤進度。
+          歡迎來到火車嘟嘟嘟社團網站。你可以使用 Email 登入或註冊，
+          新增每次練習紀錄，並從 Supabase 載入歷史資料，像列車時刻表一樣穩定追蹤進度。
+        </p>
+      </Card>
+
+      <Card>
+        <h2 className="text-xl font-semibold text-zinc-900">網站自介</h2>
+        <p className="mt-2 text-sm leading-7 text-zinc-600">
+          火車嘟嘟嘟是一個以「列車旅程」為主題的訓練紀錄平台，
+          希望讓每位成員都能把每天的努力，累積成看得見的里程碑。
+          我們把登入、註冊、忘記密碼、重設密碼、紀錄新增與歷史查詢整合在同一站，
+          讓你用最少步驟完成訓練管理。
+        </p>
+        <p className="mt-3 text-sm leading-7 text-zinc-600">
+          不管你是剛起步的新手，或是固定訓練的進階跑者，
+          這個網站都會像準時發車的列車一樣，陪你穩定前進。
         </p>
       </Card>
 
@@ -21,13 +35,13 @@ export default function Home() {
         <Card>
           <h2 className="text-xl font-semibold text-zinc-900">車站入口</h2>
           <p className="mt-2 text-sm text-zinc-600">
-            透過 Supabase Email 登入，開始你的火車旅程。
+            透過 Supabase Email 登入或註冊，開始你的火車旅程。
           </p>
           <Link
             href="/login"
             className="train-button mt-4 inline-flex rounded-lg px-4 py-2 text-sm font-semibold text-white transition"
           >
-            前往登入
+            前往登入中心
           </Link>
         </Card>
 

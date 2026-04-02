@@ -1,29 +1,29 @@
 ﻿import { redirect } from "next/navigation";
-import { createSupabaseServerClient } from "../../lib/supabase/server";
 import Card from "../components/card";
-import LoginForm from "./login-form";
+import { createSupabaseServerClient } from "../../lib/supabase/server";
+import ResetPasswordForm from "./reset-password-form";
 
-export default async function LoginPage() {
+export default async function ResetPasswordPage() {
   const supabase = await createSupabaseServerClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
 
-  if (user) {
-    redirect("/records");
+  if (!user) {
+    redirect("/login");
   }
 
   return (
     <div className="w-full">
       <Card className="mx-auto w-full max-w-lg">
         <h1 className="text-2xl font-bold tracking-tight text-zinc-900">
-          列車登入中心
+          重設密碼
         </h1>
         <p className="mt-2 text-sm text-zinc-600">
-          這裡提供登入、註冊與忘記密碼。完成登入後就能管理行車紀錄。
+          請輸入新密碼完成更新，更新後會回到登入頁。
         </p>
         <div className="mt-6">
-          <LoginForm />
+          <ResetPasswordForm />
         </div>
       </Card>
     </div>
