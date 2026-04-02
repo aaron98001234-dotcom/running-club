@@ -1,7 +1,19 @@
 ﻿import Link from "next/link";
 import Card from "./components/card";
+import { createSupabaseServerClient } from "../lib/supabase/server";
 
-export default function Home() {
+type UserMetadata = {
+  nickname?: string;
+};
+
+export default async function Home() {
+  const supabase = await createSupabaseServerClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  const metadata = (user?.user_metadata ?? {}) as UserMetadata;
+
   return (
     <div className="grid w-full gap-6">
       <Card>
@@ -33,15 +45,19 @@ export default function Home() {
 
       <div className="grid gap-4 sm:grid-cols-2">
         <Card>
-          <h2 className="text-xl font-semibold text-zinc-900">車站入口</h2>
+          <h2 className="text-xl font-semibold text-zinc-900">
+            {user ? "個人車廂" : "車站入口"}
+          </h2>
           <p className="mt-2 text-sm text-zinc-600">
-            透過 Supabase Email 登入或註冊，開始你的火車旅程。
+            {user
+              ? `哈囉${metadata.nickname ? `，${metadata.nickname}` : ""}，已登入可前往個人頁查看資料。`
+              : "透過 Supabase Email 登入或註冊，開始你的火車旅程。"}
           </p>
           <Link
-            href="/login"
+            href={user ? "/profile" : "/login"}
             className="train-button mt-4 inline-flex rounded-lg px-4 py-2 text-sm font-semibold text-white transition"
           >
-            前往登入中心
+            {user ? "前往個人頁" : "前往登入中心"}
           </Link>
         </Card>
 
